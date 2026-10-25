@@ -511,3 +511,29 @@ login page). Both are fixed (see the "fix(web)" note in the phase 7 commit).
 
 ---
 
+
+## AI usage
+
+**Tools used, and what for**
+
+- **Claude** and **ChatGPT** for the Docker setup: `docker-compose.yml` with a
+  single-node MongoDB replica set (the `rs.initiate` healthcheck), the API and
+  web images, and nginx proxying `/api` and `/socket.io` on one origin.
+- **Claude** and **ChatGPT** for the WebSocket layer: cookie-authenticated
+  Socket.IO handshakes, server-chosen `org:{orgId}` rooms, and emitting events
+  only after the database write succeeds.
+
+**A suggestion I rejected or corrected**
+
+The AI added packages outside the assignment's allowed stack: Playwright for a
+browser test suite, `cookie` and `pino-http` at runtime, and several ESLint and
+Vite plugins. I rejected all of them and had each one replaced with a few lines
+of plain code:
+
+- a small loop to read the session cookie
+- one middleware that logs each request
+- core-only ESLint rules, with a 10-line local rule so components used only in
+  JSX count as "used"
+
+The trade-off I accepted is that `npm run dev` now reloads the page on save
+instead of hot-swapping React components.
