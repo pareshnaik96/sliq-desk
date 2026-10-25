@@ -13,7 +13,8 @@
     "start": "node src/index.js",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed": "node src/seed.js"
   },
   "dependencies": {
     "argon2": "^0.41.1",

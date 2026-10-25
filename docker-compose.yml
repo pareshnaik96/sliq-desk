@@ -21,6 +21,8 @@ services:
 
   api:
     build: ./api
+    # Seed demo data (only if the DB is empty), then start the server.
+    command: ['sh', '-c', 'node src/seed.js && exec node src/index.js']
     environment:
       NODE_ENV: production
       PORT: 4000
