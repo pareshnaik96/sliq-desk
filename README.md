@@ -25,13 +25,14 @@ docker compose up --build
 
 Open **http://localhost:8080**. A fresh clone works with no edits and no
 `.env` file, because compose carries working defaults. To override a value,
-copy `.env.example` to `.env`.
+copy `.env.example` (keys only) to `.env` and fill in the values you want; empty
+values fall back to the defaults in `docker-compose.yml`.
 
 | Service | URL | Notes |
 | ------- | --- | ----- |
 | web (nginx + built SPA) | http://localhost:8080 | Proxies `/api/*` and `/socket.io/*` to the API, so the browser sees one origin |
 | api | http://localhost:4000 | e.g. `curl localhost:4000/health` |
-| mongo | internal | `--replSet rs0`; its healthcheck runs `rs.initiate` on first boot |
+| mongo | `mongodb://localhost:27018/sliqdesk?directConnection=true` | For Compass/mongosh; bound to localhost only. `--replSet rs0`; its healthcheck runs `rs.initiate` on first boot |
 
 On startup the api container runs `node src/seed.js`, then the server. The seed
 only writes when the database is empty. To reset all data, run
@@ -417,7 +418,7 @@ as `cursor`; it's `null` on the last page.
 | `slaDueAt` on create / raise to high or urgent | Done | integration (create, raise, lower clears) |
 | First staff comment sets `firstStaffResponseAt` | Done | integration: set once, not overwritten |
 | Worker claims atomically, emits `ticket.overdue`, restart- and multi-instance-safe | Done | integration: claimed once; skips answered, resolved/closed, low/medium; 3 concurrent workers → no duplicates; live: alert 124 s after creation with `SLA_MINUTES=2` |
-| `SLA_MINUTES=2`, `SLA_POLL_SECONDS=10` in `.env.example` | Done | |
+| `SLA_MINUTES=2`, `SLA_POLL_SECONDS=10` defaults | Done | Set as defaults in `docker-compose.yml`; `.env.example` lists the keys |
 | **Frontend** | | |
 | Signup, Login | Done | browser |
 | Ticket list: status/priority/assignee filters, Load more, overdue badge | Done | browser |
@@ -432,7 +433,7 @@ as `cursor`; it's `null` on the last page.
 | api depends on healthy mongo, runs seed then server | Done | live |
 | web served by nginx | Done | live + browser |
 | Optional redis service | **Not done** | Goes with the Redis adapter above |
-| `.env.example` with working defaults, no real secrets; fresh clone + `docker compose up` works | Done | live: `docker compose down -v && up` from the committed tree. `CORS_ORIGIN` is accepted as an alias of `CORS_ORIGINS`. |
+| `.env.example` with working defaults, no real secrets; fresh clone + `docker compose up` works | Partial (by choice) | `.env.example` lists keys only, at the author's request; the working dev defaults live in `docker-compose.yml`, so a fresh clone still runs with zero edits. To match the brief literally, put the values back into `.env.example`. Verified: live: `docker compose down -v && up` from the committed tree. `CORS_ORIGIN` is accepted as an alias of `CORS_ORIGINS`. |
 | **Tests and lint** | Done | `npm test` / `npm run lint` in both packages |
 
 Things the browser run caught that unit tests didn't: two real session bugs in the
@@ -510,9 +511,3 @@ login page). Both are fixed (see the "fix(web)" note in the phase 7 commit).
 
 ---
 
-## AI usage
-
-> **TODO (author to complete — do not leave as-is):**
->
-> - **Tools used:** _<fill in: which AI tools/assistants were used, and for what parts of the work>_
-> - **A suggestion I rejected or corrected:** _<fill in: a real example of AI output you changed or turned down, and why>_

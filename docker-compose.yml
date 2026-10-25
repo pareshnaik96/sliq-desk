@@ -6,6 +6,11 @@ services:
     command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
     volumes:
       - mongo-data:/data/db
+    # For MongoDB Compass / mongosh from your machine:
+    #   mongodb://localhost:27018/sliqdesk?directConnection=true
+    # (27018 avoids clashing with a locally installed MongoDB; bound to localhost only.)
+    ports:
+      - '127.0.0.1:27018:27017'
     # Initiates the single-node replica set on first boot (transactions need one).
     healthcheck:
       test:
