@@ -1,9 +1,11 @@
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import { authenticate } from './middleware/authenticate.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { healthRoutes } from './routes/health.routes.js';
+import { membersRoutes } from './routes/members.routes.js';
 
 export function createApp({ config, logger }) {
   const app = express();
@@ -31,6 +33,7 @@ export function createApp({ config, logger }) {
 
   app.use('/health', healthRoutes());
   app.use('/auth', authRoutes(config));
+  app.use('/members', authenticate(config), membersRoutes());
 
   app.use(notFoundHandler);
   app.use(errorHandler(logger));
