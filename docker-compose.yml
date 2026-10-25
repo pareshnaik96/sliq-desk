@@ -1,0 +1,54 @@
+# `docker compose up` from a fresh clone: no .env needed (defaults below).
+# Copy .env.example to .env to override any value.
+services:
+  mongo:
+    image: mongo:7.0
+    command: ['--replSet', 'rs0', '--bind_ip_all', '--port', '27017']
+    volumes:
+      - mongo-data:/data/db
+    # Initiates the single-node replica set on first boot (transactions need one).
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - "try { rs.status().ok } catch (e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongo:27017' }] }).ok }"
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 10s
+
+  api:
+    build: ./api
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      MONGO_URI: mongodb://mongo:27017/sliqdesk?replicaSet=rs0
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-before-deploying}
+      JWT_TTL_SECONDS: ${JWT_TTL_SECONDS:-900}
+      # The demo is served over plain http://localhost; set true behind HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
+      TRUST_PROXY: 1
+      SLA_MINUTES: ${SLA_MINUTES:-2}
+      SLA_POLL_SECONDS: ${SLA_POLL_SECONDS:-10}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-20}
+      AUTH_RATE_LIMIT_WINDOW_MS: ${AUTH_RATE_LIMIT_WINDOW_MS:-900000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - '4000:4000'
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    ports:
+      - '8080:80'
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  mongo-data:

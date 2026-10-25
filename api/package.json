@@ -1,0 +1,38 @@
+{
+  "name": "sliqdesk-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SliqDesk multi-tenant support desk API",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "pino": "^9.6.0",
+    "socket.io": "^4.8.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "eslint": "^9.18.0",
+    "mongodb-memory-server": "^10.1.3",
+    "prettier": "^3.4.2",
+    "socket.io-client": "^4.8.1",
+    "supertest": "^7.0.0",
+    "vitest": "^5.0.5"
+  }
+}
