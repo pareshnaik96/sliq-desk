@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { authRoutes } from './routes/auth.routes.js';
 import { healthRoutes } from './routes/health.routes.js';
 
 export function createApp({ config, logger }) {
@@ -29,6 +30,7 @@ export function createApp({ config, logger }) {
   });
 
   app.use('/health', healthRoutes());
+  app.use('/auth', authRoutes(config));
 
   app.use(notFoundHandler);
   app.use(errorHandler(logger));

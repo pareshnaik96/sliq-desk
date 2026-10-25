@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { allModels } from '../models/index.js';
 
 mongoose.set('strictQuery', true);
 
@@ -10,6 +11,7 @@ export async function connectDb(uri, { logger, attempts = 30, delayMs = 2000, db
   for (let i = 1; ; i++) {
     try {
       await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000, dbName });
+      await ensureIndexes();
       return mongoose.connection;
     } catch (err) {
       if (i >= attempts) throw err;
@@ -17,6 +19,10 @@ export async function connectDb(uri, { logger, attempts = 30, delayMs = 2000, db
       await new Promise((r) => setTimeout(r, delayMs));
     }
   }
+}
+
+export async function ensureIndexes() {
+  await Promise.all(allModels.map((m) => m.createIndexes()));
 }
 
 export async function disconnectDb() {
