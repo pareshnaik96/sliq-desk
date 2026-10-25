@@ -6,6 +6,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { authRoutes } from './routes/auth.routes.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { membersRoutes } from './routes/members.routes.js';
+import { ticketsRoutes } from './routes/tickets.routes.js';
 
 export function createApp({ config, logger }) {
   const app = express();
@@ -34,6 +35,7 @@ export function createApp({ config, logger }) {
   app.use('/health', healthRoutes());
   app.use('/auth', authRoutes(config));
   app.use('/members', authenticate(config), membersRoutes());
+  app.use('/tickets', authenticate(config), ticketsRoutes());
 
   app.use(notFoundHandler);
   app.use(errorHandler(logger));
